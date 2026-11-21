@@ -1,0 +1,7 @@
+EZEE VISION CHAMPUA — AUTH STARTER
+
+Copy App.tsx into the root of your existing mobile-app folder (replace its current App.tsx).
+Copy src/lib/supabase.ts into mobile-app/src/lib/supabase.ts.
+Run the SQL in supabase/schema.sql in the Supabase SQL Editor.
+Use .env.example as the template for mobile-app/.env.
+Follow README-SETUP.md in order.
