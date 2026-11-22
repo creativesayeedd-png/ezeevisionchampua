@@ -1,36 +1,28 @@
-EZEE VISION CHAMPUA — FRESH STARTER PROJECT
-============================================
+EZEE VISION CHAMPUA — LOGIN / SIGN-UP APP INTERFACE
+==================================================
 
-Is ZIP mein purani HTML file ki zaroorat nahi hai. Fresh project files already included hain.
+WHAT IS INCLUDED
+- index.html: mobile-first app-style login and student sign-up screen
+- assets/css/app.css: responsive navy, white and gold interface
+- assets/js/app.js: login/sign-up screen switch, password visibility, input validation and honest prototype messages
+- assets/images/ezee-vision-logo.png: the logo supplied for this project
+- firebase-config.js: your existing Firebase web configuration bootstrap
 
-ZIP KE ANDAR:
-1. index.html              — website ka starting page
-2. firebase-config.js      — aapke Firebase project ki web configuration
-3. assets/css/style.css   — blue + orange responsive design
-4. assets/js/app.js       — Firebase initialization status screen par dikhata hai
+DEPLOY ON NETLIFY (GITHUB METHOD)
+1. Extract this ZIP on your phone/computer.
+2. Open your GitHub repository used by Netlify.
+3. Upload the CONTENTS of this folder to the repository root (not the outer folder itself).
+4. Make sure index.html is directly in the repository root.
+5. Commit the changes. Netlify should redeploy automatically.
 
-AB KYA KARNA HAI:
-1. ZIP ko extract karein.
-2. Extract hue folder ke andar ki saari files GitHub repository ke ROOT mein upload karein.
-   Dhyan rahe: index.html root mein hona chahiye, kisi extra nested folder ke andar nahi.
-3. Netlify mein isi repository ko connect karein.
-4. Publish directory ko root/default (.) rakhein. Build command ki zaroorat nahi hai.
-5. Website open karein. Firebase status mein "Firebase SDK initialized" dikhna chahiye.
+IMPORTANT STATUS
+This delivery is the front-end interface prototype, not the completed authentication system.
+The buttons validate the input and show clear prototype messages; they do NOT create accounts or sign users in yet.
+Firebase configuration is included but is not connected to the form handlers in this build.
+Next implementation step: Firebase Authentication using mobile-number-derived internal email + password,
+Firestore user profiles, pending student approval, and five pre-approved teacher accounts.
 
-FIREBASE PROJECT:
-Project ID: ezee-vision-champua-6638d
-Web app: EZEE VISION CHAMPUA WEB
-
-IMPORTANT:
-- Yeh starter Firebase SDK ko initialize karta hai; abhi login, registration, teacher accounts,
-  student approval, attendance, fees ya dashboard features implement nahi kiye gaye hain.
-- Agle development steps mein mobile number + password login banega. SMS OTP use nahi karenge.
-- Sirf 2 portals honge: Teacher aur Student. 5 approved teachers ko same full permissions milengi.
-- Firestore Security Rules zaroori hain. Sirf front-end hide/show se data secure nahi hota.
-- firebase-config.js mein web app config hota hai. Kabhi bhi Firebase service-account private key,
-  admin SDK key, password ya private credential website/GitHub mein upload mat karein.
-- Firebase Auth mein apni deployed Netlify domain ko Authorized domains mein add karna hoga,
-  jab actual domain mil jaaye aur login implement ho.
-
-Firebase SDK CDN version: 13.4.0
-Reference: https://firebase.google.com/docs/web/setup
+SECURITY
+- Never put Firebase Admin SDK service-account credentials in this front-end project.
+- Do not let a public sign-up form assign the teacher role.
+- Enforce teacher/student permissions in Firestore Security Rules.
