@@ -1,0 +1,17 @@
+FIVE TEACHER ACCOUNT SETUP TEMPLATE
+===================================
+Firebase Authentication internal email pattern:
+91 + 10-digit mobile + @login.ezeevisionchampua.com
+
+Create 5 accounts manually in Firebase Authentication. For each Authentication user,
+copy its UID and create users/{UID} in Firestore with:
+
+name       (string)     Teacher full name
+mobile     (string)     10-digit mobile only
+role       (string)     teacher
+status     (string)     approved
+createdAt  (timestamp)  current date/time
+updatedAt  (timestamp)  current date/time
+
+Do not store teacher passwords in this file, Firestore, GitHub, WhatsApp, or spreadsheets.
+All 5 trusted teachers have identical permissions.
