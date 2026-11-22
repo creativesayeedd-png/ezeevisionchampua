@@ -1,43 +1,90 @@
-(function () {
-  const statusPanel = document.querySelector('.status-panel');
-  const statusTitle = document.getElementById('firebase-status');
-  const statusDetail = document.getElementById('firebase-detail');
-  const statusIcon = document.getElementById('status-icon');
-  const year = document.getElementById('year');
+(() => {
+  const loginForm = document.getElementById('loginForm');
+  const signupForm = document.getElementById('signupForm');
+  const switchBtn = document.getElementById('switchBtn');
+  const switchLine = document.getElementById('switchLine');
+  const formTitle = document.getElementById('formTitle');
+  const formDescription = document.getElementById('formDescription');
+  const heroTitle = document.getElementById('heroTitle');
+  const toast = document.getElementById('toast');
+  let toastTimer;
 
-  if (year) year.textContent = new Date().getFullYear();
-
-  function setStatus(state, title, detail, icon) {
-    if (statusPanel) statusPanel.dataset.state = state;
-    if (statusTitle) statusTitle.textContent = title;
-    if (statusDetail) statusDetail.textContent = detail;
-    if (statusIcon) statusIcon.textContent = icon;
+  function showToast(message) {
+    toast.textContent = message;
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.classList.remove('show'), 3600);
   }
 
-  if (window.evcFirebase && window.evcFirebase.app) {
-    setStatus(
-      'ok',
-      'Firebase SDK initialized',
-      'Project configuration loaded for ' + window.evcFirebase.app.options.projectId + '. Authentication and database features will be added in the next development step.',
-      '✓'
-    );
-  } else {
-    setStatus(
-      'error',
-      'Firebase setup needs attention',
-      'Check your internet connection and confirm that firebase-config.js is in the same folder as index.html.',
-      '!'
-    );
+  function setMode(mode) {
+    const isSignup = mode === 'signup';
+    loginForm.classList.toggle('is-hidden', isSignup);
+    signupForm.classList.toggle('is-hidden', !isSignup);
+    formTitle.textContent = isSignup ? 'Create your student account' : 'Sign in to your account';
+    formDescription.textContent = isSignup
+      ? 'Send an access request to your coaching institute.'
+      : 'Enter your registered mobile number and password.';
+    heroTitle.innerHTML = isSignup ? 'Create Your Account<span>.</span>' : 'Welcome Back<span>!</span>';
+    switchLine.querySelector('span').textContent = isSignup ? 'Already registered?' : 'New to EZEE VISION?';
+    switchBtn.textContent = isSignup ? 'Login' : 'Create account';
   }
 
-  window.addEventListener('evc-firebase-ready', function () {
-    if (window.evcFirebase && window.evcFirebase.app) {
-      setStatus(
-        'ok',
-        'Firebase SDK initialized',
-        'Project configuration loaded for ' + window.evcFirebase.app.options.projectId + '. Authentication and database features will be added in the next development step.',
-        '✓'
-      );
+  switchBtn.addEventListener('click', () => {
+    setMode(signupForm.classList.contains('is-hidden') ? 'signup' : 'login');
+  });
+
+  document.querySelectorAll('[data-toggle-password]').forEach((button) => {
+    button.addEventListener('click', () => {
+      const input = document.getElementById(button.dataset.togglePassword);
+      const show = input.type === 'password';
+      input.type = show ? 'text' : 'password';
+      button.classList.toggle('is-visible', show);
+      button.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
+    });
+  });
+
+  document.querySelectorAll('input[inputmode="numeric"]').forEach((input) => {
+    input.addEventListener('input', () => {
+      input.value = input.value.replace(/\D/g, '').slice(0, 10);
+    });
+  });
+
+  loginForm.addEventListener('submit', (event) => {
+    event.preventDefault();
+    const mobile = document.getElementById('loginMobile').value.trim();
+    const password = document.getElementById('loginPassword').value;
+    if (!/^[6-9]\d{9}$/.test(mobile)) {
+      showToast('Please enter a valid 10-digit Indian mobile number.');
+      return;
     }
+    if (!password) {
+      showToast('Please enter your password.');
+      return;
+    }
+    showToast('Login screen is ready. Secure Firebase sign-in will be connected in the next build step.');
+  });
+
+  signupForm.addEventListener('submit', (event) => {
+    event.preventDefault();
+    const name = document.getElementById('signupName').value.trim();
+    const mobile = document.getElementById('signupMobile').value.trim();
+    const password = document.getElementById('signupPassword').value;
+    if (name.length < 2) {
+      showToast('Please enter your full name.');
+      return;
+    }
+    if (!/^[6-9]\d{9}$/.test(mobile)) {
+      showToast('Please enter a valid 10-digit Indian mobile number.');
+      return;
+    }
+    if (password.length < 6) {
+      showToast('Password must contain at least 6 characters.');
+      return;
+    }
+    showToast('Registration screen is ready. Firebase account creation and teacher approval will be connected next.');
+  });
+
+  document.getElementById('forgotBtn').addEventListener('click', () => {
+    showToast('For password reset, please contact one of your authorised EZEE VISION teachers.');
   });
 })();
