@@ -1,369 +1,146 @@
 (() => {
   'use strict';
-
   const $ = (id) => document.getElementById(id);
-  const loginForm = $('loginForm');
-  const signupForm = $('signupForm');
-  const authViews = $('authViews');
-  const accountPanel = $('accountPanel');
-  const switchBtn = $('switchBtn');
-  const switchLine = $('switchLine');
-  const formTitle = $('formTitle');
-  const formDescription = $('formDescription');
-  const heroTitle = $('heroTitle');
-  const toast = $('toast');
-  const recoveryModal = $('recoveryModal');
   const settings = window.EVC_SETTINGS || {};
-  const firebaseReady = Boolean(window.evcFirebase && window.evcFirebase.auth && window.evcFirebase.db);
-  const auth = firebaseReady ? window.evcFirebase.auth : null;
-  const db = firebaseReady ? window.evcFirebase.db : null;
-  let toastTimer;
-  let busy = false;
-  let currentUser = null;
-  let currentProfile = null;
+  const auth = window.evcFirebase?.auth || null;
+  const db = window.evcFirebase?.db || null;
+  let busy = false, deferredInstallPrompt = null, toastTimer;
 
-  function showToast(message, duration = 4200) {
-    toast.textContent = message;
-    toast.classList.add('show');
+  function toast(message) {
+    $('toast').textContent = message;
+    $('toast').classList.add('show');
     clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => toast.classList.remove('show'), duration);
+    toastTimer = setTimeout(() => $('toast').classList.remove('show'), 4500);
   }
-
-  function setBusy(form, isBusy, buttonText) {
-    const button = form.querySelector('button[type="submit"]');
-    button.disabled = isBusy;
-    button.classList.toggle('is-loading', isBusy);
-    if (isBusy) {
-      button.dataset.originalText = button.querySelector('span').textContent;
-      button.querySelector('span').textContent = buttonText || 'Please wait…';
-    } else {
-      button.querySelector('span').textContent = button.dataset.originalText || buttonText || 'Continue';
-    }
-  }
-
-  function setMode(mode) {
-    const isSignup = mode === 'signup';
-    loginForm.classList.toggle('is-hidden', isSignup);
-    signupForm.classList.toggle('is-hidden', !isSignup);
-    formTitle.textContent = isSignup ? 'Create your student account' : 'Sign in to your account';
-    formDescription.textContent = isSignup
-      ? 'Register once. Your details will be saved securely.'
-      : 'Enter your registered mobile number and password.';
-    heroTitle.innerHTML = isSignup ? 'Create Your Account<span>.</span>' : 'Welcome Back<span>!</span>';
-    switchLine.querySelector('span').textContent = isSignup ? 'Already registered?' : 'New to EZEE VISION?';
-    switchBtn.textContent = isSignup ? 'Login' : 'Create account';
-  }
-
-  function cleanMobile(value) {
-    return String(value || '').replace(/\D/g, '').slice(-10);
-  }
-
-  function validMobile(mobile) {
-    return /^[6-9]\d{9}$/.test(mobile);
-  }
-
-  // Firebase Email/Password is used behind the scenes; students only see their mobile number.
-  function mobileLoginEmail(mobile) {
-    return `91${mobile}@login.ezeevisionchampua.com`;
-  }
-
-  function firebaseErrorMessage(error) {
-    const code = error && error.code ? error.code : '';
-    const messages = {
-      'auth/invalid-email': 'Account login ID is not valid. Please contact institute support.',
-      'auth/user-not-found': 'No account found for this mobile number. Please create an account first.',
-      'auth/wrong-password': 'Incorrect password. Please try again.',
-      'auth/invalid-credential': 'Mobile number or password is incorrect.',
-      'auth/email-already-in-use': 'This mobile number is already registered. Please login.',
-      'auth/weak-password': 'Please choose a stronger password with at least 8 characters.',
-      'auth/too-many-requests': 'Too many attempts. Please wait and try again later.',
-      'auth/network-request-failed': 'Network error. Check your internet connection.',
-      'permission-denied': 'Database permission denied. The institute administrator must publish the Firestore security rules.',
-      'firestore/permission-denied': 'Database permission denied. Please contact institute support.'
+  function mobile(value) { return String(value || '').replace(/\D/g, '').slice(-10); }
+  function validMobile(value) { return /^[6-9]\d{9}$/.test(value); }
+  function loginEmail(value) { return `91${value}@login.ezeevisionchampua.com`; }
+  function errorText(error) {
+    const code = error?.code || '';
+    const map = {
+      'auth/invalid-credential': 'Mobile number ya password galat hai.',
+      'auth/user-not-found': 'Is mobile number ka account nahi mila.',
+      'auth/wrong-password': 'Password galat hai.',
+      'auth/email-already-in-use': 'Ye mobile number pehle se registered hai. Login karein.',
+      'auth/weak-password': 'Kam se kam 8 characters ka password rakhein.',
+      'auth/too-many-requests': 'Bahut attempts hue. Thodi der baad try karein.',
+      'auth/network-request-failed': 'Internet connection check karein.',
+      'permission-denied': 'Firestore Rules ne request reject ki. Correct project ke Rules tab mein supplied rules Publish karein.',
+      'firestore/permission-denied': 'Firestore permission denied. Rules aur project ID verify karein.'
     };
-    if (messages[code]) return messages[code];
-    if (error && /permission-denied/i.test(error.message || '')) return messages['permission-denied'];
-    return 'Something went wrong. Please try again or contact support.';
+    if (map[code]) return map[code];
+    if (/permission-denied/i.test(error?.message || '')) return map['permission-denied'];
+    return 'Request complete nahi hui. Firebase Console mein Auth/Firestore error verify karein.';
   }
-
-  function openAuthViews() {
-    authViews.classList.remove('is-hidden');
-    accountPanel.classList.add('is-hidden');
-    currentUser = null;
-    currentProfile = null;
+  function switchMode(signup) {
+    $('loginForm').classList.toggle('hidden', signup);
+    $('signupForm').classList.toggle('hidden', !signup);
+    $('formTitle').textContent = signup ? 'Create your student account' : 'Sign in to your account';
+    $('formDescription').textContent = signup ? 'Register once. Your details will be saved securely.' : 'Enter your registered mobile number and password.';
+    $('switchText').textContent = signup ? 'Already registered?' : 'New to EZEE VISION?';
+    $('switchBtn').textContent = signup ? 'Login' : 'Create account';
+    document.querySelector('.hero-title h1').innerHTML = signup ? 'Create Your Account<span>.</span>' : 'Welcome Back<span>!</span>';
   }
+  $('switchBtn').addEventListener('click', () => switchMode($('signupForm').classList.contains('hidden')));
+  document.querySelectorAll('[data-toggle]').forEach(btn => btn.addEventListener('click', () => {
+    const input = $(btn.dataset.toggle); input.type = input.type === 'password' ? 'text' : 'password';
+  }));
+  document.querySelectorAll('input[inputmode="numeric"]').forEach(input => input.addEventListener('input', () => input.value = input.value.replace(/\D/g, '').slice(0,10)));
 
-  function showAccountPanel(user, profile) {
-    currentUser = user;
-    currentProfile = profile;
-    authViews.classList.add('is-hidden');
-    accountPanel.classList.remove('is-hidden');
-
-    const role = profile.role === 'teacher' ? 'Teacher' : 'Student';
-    $('accountName').textContent = profile.name || user.displayName || 'EVC Member';
-    $('accountRole').textContent = role;
-    $('accountStatus').textContent = profile.status === 'approved' ? 'Approved' : (profile.status || 'Pending');
-
-    if (profile.status === 'approved' && (profile.role === 'teacher' || profile.role === 'student')) {
-      $('accountIcon').textContent = '✓';
-      $('accountIcon').className = 'account-success-icon';
-      $('accountKicker').textContent = `${role.toUpperCase()} ACCESS VERIFIED`;
-      $('accountHeading').textContent = `Welcome, ${(profile.name || user.displayName || 'Member').split(' ')[0]}!`;
-      $('accountMessage').textContent = 'Your Firebase account and profile are active. The role-based portal dashboard will open here in the next application module.';
-      $('refreshStatusBtn').classList.remove('is-hidden');
-    } else if (profile.role === 'student' && profile.status === 'pending') {
-      $('accountIcon').textContent = '…';
-      $('accountIcon').className = 'account-pending-icon';
-      $('accountKicker').textContent = 'REGISTRATION RECEIVED';
-      $('accountHeading').textContent = 'Waiting for teacher approval';
-      $('accountMessage').textContent = 'Your account details are saved. A teacher must approve your student account before study materials and other portal features become available.';
-      $('refreshStatusBtn').classList.remove('is-hidden');
-    } else {
-      $('accountIcon').textContent = '!';
-      $('accountIcon').className = 'account-pending-icon';
-      $('accountKicker').textContent = 'ACCOUNT ACCESS';
-      $('accountHeading').textContent = 'Please contact the institute';
-      $('accountMessage').textContent = 'This account is not currently approved for portal access. Contact EZEE VISION CHAMPUA support for help.';
-      $('refreshStatusBtn').classList.add('is-hidden');
-    }
-  }
-
-  async function readOwnProfile(user) {
+  async function showProfile(user) {
     const snap = await db.collection('users').doc(user.uid).get();
-    if (!snap.exists) {
-      throw new Error('PROFILE_NOT_FOUND');
+    if (!snap.exists) throw new Error('PROFILE_NOT_FOUND');
+    const profile = snap.data();
+    $('authViews').classList.add('hidden'); $('accountPanel').classList.remove('hidden');
+    $('profileName').textContent = profile.name || user.displayName || 'Member';
+    $('profileRole').textContent = profile.role || 'Unknown'; $('profileStatus').textContent = profile.status || 'Unknown';
+    if (profile.status === 'pending') {
+      $('stateKicker').textContent = 'REGISTRATION RECEIVED'; $('stateTitle').textContent = 'Waiting for teacher approval';
+      $('stateMessage').textContent = 'Your account is saved. A teacher must approve the student profile before you can access learning records.';
+    } else if (profile.status === 'approved' && ['student','teacher'].includes(profile.role)) {
+      $('stateKicker').textContent = `${profile.role.toUpperCase()} ACCESS VERIFIED`; $('stateTitle').textContent = `Welcome, ${(profile.name || 'Member').split(' ')[0]}!`;
+      $('stateMessage').textContent = 'Account verified. Teacher and Student dashboards will be connected in the next phase.';
+    } else {
+      $('stateKicker').textContent = 'ACCESS NOT ACTIVE'; $('stateTitle').textContent = 'Please contact institute support';
+      $('stateMessage').textContent = 'This profile is not approved for portal access.';
     }
-    return snap.data();
   }
-
-  async function refreshCurrentStatus() {
-    if (!auth || !auth.currentUser) return;
-    try {
-      const profile = await readOwnProfile(auth.currentUser);
-      showAccountPanel(auth.currentUser, profile);
-      showToast(profile.status === 'approved' ? 'Your account is approved.' : 'Your account is still waiting for teacher approval.');
-    } catch (error) {
-      showToast(error.message === 'PROFILE_NOT_FOUND' ? 'Account profile is missing. Please contact support.' : firebaseErrorMessage(error));
-    }
-  }
-
-  async function createStudentProfile(user, name, mobile) {
-    const ref = db.collection('users').doc(user.uid);
-    const existing = await ref.get();
-    if (existing.exists) {
-      throw new Error('PROFILE_EXISTS');
-    }
-    await ref.set({
-      name,
-      mobile,
-      role: 'student',
-      status: 'pending',
-      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-    });
-    try {
-      await user.updateProfile({ displayName: name });
-    } catch (_) {
-      // Firestore remains the source of truth for the profile name.
-    }
-    return { name, mobile, role: 'student', status: 'pending' };
-  }
-
   async function handleSignup(event) {
-    event.preventDefault();
-    if (busy) return;
-    const name = $('signupName').value.trim().replace(/\s+/g, ' ');
-    const mobile = cleanMobile($('signupMobile').value);
-    const password = $('signupPassword').value;
-    const confirmPassword = $('signupConfirmPassword').value;
-
-    if (name.length < 2) return showToast('Please enter your full name.');
-    if (!validMobile(mobile)) return showToast('Please enter a valid 10-digit Indian mobile number.');
-    if (password.length < 8) return showToast('Password must contain at least 8 characters.');
-    if (password !== confirmPassword) return showToast('Password and confirm password do not match.');
-    if (!firebaseReady) return showToast('Firebase is not connected. Please check the Firebase setup files.');
-
+    event.preventDefault(); if (busy) return;
+    const name = $('signupName').value.trim().replace(/\s+/g,' '), number = mobile($('signupMobile').value);
+    const password = $('signupPassword').value, confirm = $('signupConfirm').value;
+    if (name.length < 2) return toast('Full name enter karein.');
+    if (!validMobile(number)) return toast('Valid 10-digit Indian mobile number enter karein.');
+    if (password.length < 8) return toast('Password kam se kam 8 characters ka hona chahiye.');
+    if (password !== confirm) return toast('Dono passwords match nahi kar rahe.');
+    if (!auth || !db) return toast('Firebase SDK initialize nahi hua. Project configuration check karein.');
     busy = true;
-    setBusy(signupForm, true, 'Creating account…');
     try {
       await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
-      const email = mobileLoginEmail(mobile);
-      let credential;
-      try {
-        credential = await auth.createUserWithEmailAndPassword(email, password);
-      } catch (createError) {
-        // Recover an interrupted first signup (Auth account exists but its Firestore profile
-        // was not saved). A normal existing account is sent back to the Login screen.
-        if (createError.code !== 'auth/email-already-in-use') throw createError;
-        credential = await auth.signInWithEmailAndPassword(email, password);
-        const existingProfile = await db.collection('users').doc(credential.user.uid).get();
-        if (existingProfile.exists) {
-          await auth.signOut();
-          throw new Error('PROFILE_EXISTS');
-        }
-      }
-      const profile = await createStudentProfile(credential.user, name, mobile);
-      showAccountPanel(credential.user, profile);
-      signupForm.reset();
-      showToast('Account created and saved. Teacher approval is pending.', 5200);
+      const cred = await auth.createUserWithEmailAndPassword(loginEmail(number), password);
+      const profile = {name, mobile:number, role:'student', status:'pending', createdAt:firebase.firestore.FieldValue.serverTimestamp(), updatedAt:firebase.firestore.FieldValue.serverTimestamp()};
+      await db.collection('users').doc(cred.user.uid).set(profile);
+      try { await cred.user.updateProfile({displayName:name}); } catch (_) {}
+      $('signupForm').reset();
+      await showProfile(cred.user);
+      toast('Student account successfully saved. Teacher approval pending.');
     } catch (error) {
-      if (error.message === 'PROFILE_EXISTS') {
-        showToast('This mobile number already has an account. Please login instead.');
-      } else {
-        showToast(firebaseErrorMessage(error), 5200);
-      }
-      // Do not leave an unprofiled Auth session active after a failed registration.
-      if (auth.currentUser && !currentProfile && (!currentUser || currentUser.uid !== auth.currentUser.uid)) {
-        try { await auth.signOut(); } catch (_) {}
-      }
-    } finally {
-      busy = false;
-      setBusy(signupForm, false);
-    }
+      console.error('Student signup failed', error);
+      if (error.message === 'PROFILE_NOT_FOUND') toast('Authentication account bana, lekin users/{UID} profile save nahi hua. Firebase Firestore Rules aur collection path check karein.');
+      else if (error.code === 'auth/email-already-in-use') toast('Is mobile ka Authentication account already hai. Signup repeat na karein; existing account login karein.');
+      else toast(errorText(error));
+      if (auth.currentUser) { try { await auth.signOut(); } catch (_) {} }
+    } finally { busy = false; }
   }
-
   async function handleLogin(event) {
-    event.preventDefault();
-    if (busy) return;
-    const mobile = cleanMobile($('loginMobile').value);
-    const password = $('loginPassword').value;
-    if (!validMobile(mobile)) return showToast('Please enter a valid 10-digit Indian mobile number.');
-    if (!password) return showToast('Please enter your password.');
-    if (!firebaseReady) return showToast('Firebase is not connected. Please check the Firebase setup files.');
-
+    event.preventDefault(); if (busy) return;
+    const number = mobile($('loginMobile').value), password = $('loginPassword').value;
+    if (!validMobile(number)) return toast('Valid 10-digit mobile number enter karein.');
+    if (!password) return toast('Password enter karein.');
+    if (!auth || !db) return toast('Firebase connection ready nahi hai.');
     busy = true;
-    setBusy(loginForm, true, 'Signing in…');
     try {
       await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
-      const credential = await auth.signInWithEmailAndPassword(mobileLoginEmail(mobile), password);
-      const profile = await readOwnProfile(credential.user);
-      if (!['student', 'teacher'].includes(profile.role)) {
-        await auth.signOut();
-        throw new Error('ACCOUNT_ROLE_INVALID');
-      }
-      showAccountPanel(credential.user, profile);
-      loginForm.reset();
-      showToast(profile.status === 'approved' ? 'Login successful.' : 'Login successful. Your approval is pending.');
-    } catch (error) {
+      const cred = await auth.signInWithEmailAndPassword(loginEmail(number), password);
+      await showProfile(cred.user);
+      $('loginForm').reset(); toast('Login successful.');
+    } catch(error) {
+      console.error('Login/profile check failed', error);
       if (error.message === 'PROFILE_NOT_FOUND') {
         try { await auth.signOut(); } catch (_) {}
-        showToast('Account profile not found. Please contact institute support.');
-      } else if (error.message === 'ACCOUNT_ROLE_INVALID') {
-        showToast('This account is not configured for portal access. Contact support.');
-      } else {
-        showToast(firebaseErrorMessage(error), 5200);
-      }
-    } finally {
-      busy = false;
-      setBusy(loginForm, false);
-    }
+        toast('Authentication account exists, but users/{UID} profile is missing. Check exact root collection users and exact Auth UID.');
+      } else toast(errorText(error));
+    } finally { busy = false; }
   }
+  $('loginForm').addEventListener('submit', handleLogin); $('signupForm').addEventListener('submit', handleSignup);
+  $('logoutBtn').addEventListener('click', async () => { if (auth) await auth.signOut(); $('accountPanel').classList.add('hidden'); $('authViews').classList.remove('hidden'); switchMode(false); toast('Signed out.'); });
+  $('refreshBtn').addEventListener('click', async () => { if (auth?.currentUser) { try { await showProfile(auth.currentUser); toast('Account status refreshed.'); } catch(e) { toast(errorText(e)); } } });
 
-  function supportNumber() {
-    return String(settings.whatsappSupportNumber || '').replace(/\D/g, '');
-  }
+  const waNumber = String(settings.whatsappSupportNumber || '919124478453').replace(/\D/g,'');
+  function wa(message) { if (!/^\d{10,15}$/.test(waNumber)) return toast('WhatsApp support number configure karein.'); window.open(`https://wa.me/${waNumber}?text=${encodeURIComponent(message)}`,'_blank','noopener'); }
+  $('forgotBtn').addEventListener('click', () => { $('recoveryMobile').value = mobile($('loginMobile').value); $('recovery').classList.remove('hidden'); });
+  $('closeRecovery').addEventListener('click', () => $('recovery').classList.add('hidden'));
+  $('sendRecovery').addEventListener('click', () => { const n = mobile($('recoveryMobile').value); if (!validMobile(n)) return toast('Registered 10-digit mobile number enter karein.'); wa(`Assalamu Alaikum EZEE VISION CHAMPUA Support, I need help recovering my app password. Registered mobile: +91 ${n}. Please verify my identity and guide me through a secure reset. I will not share my old password or OTP.`); $('recovery').classList.add('hidden'); });
 
-  function openWhatsApp(message) {
-    const number = supportNumber();
-    if (!/^\d{10,15}$/.test(number) || /X/i.test(String(settings.whatsappSupportNumber || ''))) {
-      showToast('WhatsApp support number is not configured yet. Add it in assets/js/settings.js.');
-      return;
-    }
-    const url = `https://wa.me/${number}?text=${encodeURIComponent(message)}`;
-    window.open(url, '_blank', 'noopener,noreferrer');
-  }
+  if (auth && db) auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).then(() => auth.onAuthStateChanged(async user => {
+    if (!user) return;
+    try { await showProfile(user); } catch (e) { console.warn('Session profile not available', e); }
+  }));
 
-  function openRecovery() {
-    $('recoveryMobile').value = cleanMobile($('loginMobile').value);
-    recoveryModal.classList.remove('is-hidden');
-    document.body.classList.add('modal-open');
-    $('recoveryMobile').focus();
-  }
-
-  function closeRecovery() {
-    recoveryModal.classList.add('is-hidden');
-    document.body.classList.remove('modal-open');
-  }
-
-  loginForm.addEventListener('submit', handleLogin);
-  signupForm.addEventListener('submit', handleSignup);
-
-  switchBtn.addEventListener('click', () => {
-    setMode(signupForm.classList.contains('is-hidden') ? 'signup' : 'login');
+  // PWA install prompt (browser decides when the install prompt is eligible).
+  window.addEventListener('beforeinstallprompt', (event) => {
+    event.preventDefault(); deferredInstallPrompt = event; $('installBtn').classList.remove('hidden');
   });
-
-  document.querySelectorAll('[data-toggle-password]').forEach((button) => {
-    button.addEventListener('click', () => {
-      const input = $(button.dataset.togglePassword);
-      const show = input.type === 'password';
-      input.type = show ? 'text' : 'password';
-      button.classList.toggle('is-visible', show);
-      button.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
-    });
+  $('installBtn').addEventListener('click', async () => {
+    if (!deferredInstallPrompt) { toast('Chrome menu ⋮ > Install app ya Add to Home screen select karein.'); return; }
+    deferredInstallPrompt.prompt(); await deferredInstallPrompt.userChoice; deferredInstallPrompt = null; $('installBtn').classList.add('hidden');
   });
+  window.addEventListener('appinstalled', () => { $('installBtn').classList.add('hidden'); toast('EZEE VISION CHAMPUA installed.'); });
 
-  document.querySelectorAll('input[inputmode="numeric"]').forEach((input) => {
-    input.addEventListener('input', () => { input.value = input.value.replace(/\D/g, '').slice(0, 10); });
-  });
-
-  $('forgotBtn').addEventListener('click', openRecovery);
-  $('closeRecoveryBtn').addEventListener('click', closeRecovery);
-  recoveryModal.addEventListener('click', (event) => { if (event.target === recoveryModal) closeRecovery(); });
-  document.addEventListener('keydown', (event) => { if (event.key === 'Escape') closeRecovery(); });
-
-  $('sendRecoveryBtn').addEventListener('click', () => {
-    const mobile = cleanMobile($('recoveryMobile').value);
-    if (!validMobile(mobile)) return showToast('Please enter the registered 10-digit mobile number.');
-    const message = `Assalamu Alaikum EZEE VISION CHAMPUA Support,\nI need help recovering my portal password.\nRegistered mobile number: +91 ${mobile}\nPlease verify my identity and guide me with a password reset. I will not share my old password or any OTP.`;
-    openWhatsApp(message);
-    closeRecovery();
-  });
-
-  $('whatsappFloat').addEventListener('click', (event) => {
-    event.preventDefault();
-    openWhatsApp('Assalamu Alaikum EZEE VISION CHAMPUA Support, I need assistance with the learning portal.');
-  });
-
-  $('refreshStatusBtn').addEventListener('click', refreshCurrentStatus);
-  $('logoutBtn').addEventListener('click', async () => {
-    try {
-      await auth.signOut();
-      openAuthViews();
-      setMode('login');
-      showToast('You have been signed out securely.');
-    } catch (error) {
-      showToast(firebaseErrorMessage(error));
-    }
-  });
-
-  if (!firebaseReady) {
-    console.error('Firebase setup is missing. Check firebase-config.js and the Firebase CDN scripts.');
-    showToast('Firebase connection not ready. Check the setup files.', 7000);
-  } else {
-    auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch((error) => {
-      console.warn('Could not set local auth persistence:', error);
-    });
-    auth.onAuthStateChanged(async (user) => {
-      if (busy) return;
-      if (!user) {
-        openAuthViews();
-        return;
-      }
-      try {
-        const profile = await readOwnProfile(user);
-        showAccountPanel(user, profile);
-      } catch (error) {
-        console.error(error);
-        try { await auth.signOut(); } catch (_) {}
-        openAuthViews();
-        if (error.message === 'PROFILE_NOT_FOUND') showToast('Account profile missing. Contact institute support.');
-        else showToast(firebaseErrorMessage(error));
-      }
-    });
-  }
-
-  const waNumber = supportNumber();
-  if (/^\d{10,15}$/.test(waNumber) && !/X/i.test(String(settings.whatsappSupportNumber || ''))) {
-    $('whatsappFloat').setAttribute('data-configured', 'true');
+  if ('serviceWorker' in navigator && location.protocol === 'https:') {
+    window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js', {scope:'/'}).then(reg => {
+      reg.addEventListener('updatefound', () => console.info('EVC PWA update is downloading.'));
+      console.info('EVC Service Worker registered:', reg.scope);
+    }).catch(err => console.error('EVC Service Worker registration failed:', err)));
   }
 })();
