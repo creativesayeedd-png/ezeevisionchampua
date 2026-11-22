@@ -101,3 +101,38 @@ button { -webkit-tap-highlight-color: transparent; }
   .field-wrap { min-height: 50px; margin-bottom: 13px; }
   .field-wrap input { height: 48px; }
 }
+
+/* Phase 2 — real Firebase account state and support controls */
+button:disabled { opacity: .72; cursor: not-allowed; }
+.primary-btn.is-loading { opacity: .82; }
+.primary-btn.is-loading::after { content: ""; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,.38); border-top-color: #fff; border-radius: 50%; animation: evcSpin .7s linear infinite; }
+@keyframes evcSpin { to { transform: rotate(360deg); } }
+.account-panel { text-align: center; padding: 18px 0 3px; }
+.account-success-icon, .account-pending-icon { width: 68px; height: 68px; margin: 0 auto 17px; display: grid; place-items: center; border-radius: 23px; font-size: 30px; font-weight: 900; color: #fff; background: linear-gradient(145deg, #dca72b, #f3ca63); box-shadow: 0 10px 24px rgba(206,151,35,.23); }
+.account-pending-icon { color: #78540c; background: linear-gradient(145deg, #fff0c9, #f8d987); }
+.account-kicker { margin: 0 0 8px; color: #ad842a; font-size: 9px; font-weight: 900; letter-spacing: 2px; }
+.account-panel h2 { margin: 0 0 10px; color: var(--navy); font-size: 24px; letter-spacing: -.8px; }
+.account-message { max-width: 340px; margin: 0 auto 22px; color: var(--muted); font-size: 13px; line-height: 1.7; }
+.account-summary { margin: 0 0 22px; padding: 4px 16px; border: 1px solid #ececf3; border-radius: 18px; background: #fafaff; text-align: left; }
+.account-summary > div { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 13px 0; border-bottom: 1px solid #ececf3; }
+.account-summary > div:last-child { border-bottom: 0; }
+.account-summary span { color: #8b91a4; font-size: 9px; font-weight: 850; letter-spacing: 1.2px; }
+.account-summary strong { color: #273269; font-size: 12px; text-align: right; overflow-wrap: anywhere; }
+.logout-btn { margin-top: 14px; padding: 10px 18px; border: 0; background: transparent; color: #34418f; font-weight: 800; font-size: 12px; cursor: pointer; }
+.account-footnote { margin: 20px 6px 0; color: #969bad; font-size: 10px; line-height: 1.6; }
+.recovery-backdrop { position: fixed; z-index: 30; inset: 0; display: grid; place-items: center; padding: 20px; background: rgba(5,12,57,.58); backdrop-filter: blur(8px); }
+.recovery-card { position: relative; width: min(100%, 410px); padding: 30px 25px 24px; border: 1px solid rgba(255,255,255,.82); border-radius: 28px; background: #fff; box-shadow: 0 25px 70px rgba(5,12,57,.28); }
+.modal-close { position: absolute; top: 12px; right: 15px; width: 34px; height: 34px; border: 0; border-radius: 50%; background: #f1f2f8; color: #525b7b; font-size: 24px; cursor: pointer; }
+.recovery-icon { width: 48px; height: 48px; display: grid; place-items: center; margin-bottom: 15px; border-radius: 16px; color: #8e6512; background: #fff2ce; font-size: 23px; }
+.recovery-card h2 { margin: 0 0 8px; color: var(--navy); font-size: 21px; letter-spacing: -.5px; }
+.recovery-card > p:not(.recovery-note) { margin: 0 0 22px; color: #7c8398; font-size: 12px; line-height: 1.65; }
+.recovery-note { margin: 14px 0 0; color: #9a9fb0; text-align: center; font-size: 10px; line-height: 1.55; }
+body.modal-open { overflow: hidden; }
+.whatsapp-float { position: fixed; z-index: 20; right: max(18px, env(safe-area-inset-right)); bottom: max(22px, env(safe-area-inset-bottom)); width: 58px; height: 58px; display: grid; place-items: center; border: 2px solid rgba(255,255,255,.94); border-radius: 50%; color: #fff; background: linear-gradient(145deg, #20c96a, #0b9c58); box-shadow: 0 9px 24px rgba(8,122,70,.34); -webkit-tap-highlight-color: transparent; }
+.whatsapp-float svg { position: relative; z-index: 2; width: 31px; height: 31px; fill: currentColor; }
+.wa-pulse { position: absolute; inset: -5px; border: 2px solid rgba(23,190,99,.62); border-radius: 50%; animation: waPulse 2.1s ease-out infinite; }
+.whatsapp-float::after { content: ""; position: absolute; inset: -2px; border-radius: inherit; background: rgba(26,190,99,.18); animation: waGlow 2.1s ease-in-out infinite; }
+@keyframes waPulse { 0% { transform: scale(.86); opacity: .9; } 85%, 100% { transform: scale(1.42); opacity: 0; } }
+@keyframes waGlow { 0%, 100% { opacity: .2; } 50% { opacity: .75; } }
+@media (max-width: 420px) { .whatsapp-float { width: 54px; height: 54px; right: 15px; bottom: max(18px, env(safe-area-inset-bottom)); } }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; } }
