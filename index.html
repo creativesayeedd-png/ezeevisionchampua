@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#1457a6" />
+  <meta name="description" content="EZEE VISION CHAMPUA Coaching Management Portal" />
+  <title>EZEE VISION CHAMPUA</title>
+  <link rel="stylesheet" href="./assets/css/style.css" />
+</head>
+<body>
+  <main class="page-shell">
+    <header class="topbar">
+      <div class="brand-mark" aria-hidden="true">EV</div>
+      <div class="brand-copy">
+        <p class="eyebrow">COACHING MANAGEMENT PORTAL</p>
+        <h1>EZEE VISION <span>CHAMPUA</span></h1>
+      </div>
+    </header>
+
+    <section class="welcome-card" aria-labelledby="welcome-title">
+      <div class="welcome-copy">
+        <span class="pill">PROJECT FOUNDATION</span>
+        <h2 id="welcome-title">A smarter learning experience starts here.</h2>
+        <p class="intro">Your fresh project workspace is ready. Firebase initialization is included, and the Teacher and Student portals will be built on this foundation.</p>
+      </div>
+      <div class="status-panel" aria-live="polite">
+        <div class="status-icon" id="status-icon">•••</div>
+        <div>
+          <p class="status-label">FIREBASE STATUS</p>
+          <p class="status-title" id="firebase-status">Checking setup…</p>
+          <p class="status-detail" id="firebase-detail">Loading the Firebase SDK and project configuration.</p>
+        </div>
+      </div>
+      <div class="info-grid">
+        <article class="info-tile">
+          <span class="tile-number">01</span>
+          <h3>Teacher Portal</h3>
+          <p>For the five approved teachers with equal permissions.</p>
+        </article>
+        <article class="info-tile">
+          <span class="tile-number">02</span>
+          <h3>Student Portal</h3>
+          <p>For each student to access their own learning records.</p>
+        </article>
+        <article class="info-tile">
+          <span class="tile-number">03</span>
+          <h3>Firebase Backend</h3>
+          <p>Authentication and Firestore foundation for secure data.</p>
+        </article>
+      </div>
+      <p class="footer-note">Made With <span aria-label="love">♥</span> By Shahid Sir</p>
+    </section>
+    <footer class="page-footer">© <span id="year"></span> EZEE VISION CHAMPUA · Learning with purpose</footer>
+  </main>
+
+  <!-- Firebase compat SDKs. Keep these before firebase-config.js and app.js. -->
+  <script src="https://www.gstatic.com/firebasejs/13.4.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/13.4.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/13.4.0/firebase-firestore-compat.js"></script>
+  <script src="./firebase-config.js"></script>
+  <script src="./assets/js/app.js"></script>
+</body>
+</html>
