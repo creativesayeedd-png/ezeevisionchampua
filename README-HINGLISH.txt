@@ -1,84 +1,56 @@
-EZEE VISION CHAMPUA — PHASE 2: FIREBASE AUTH + SUPPORT
-======================================================
+EZEE VISION CHAMPUA — PHASE 0 FOUNDATION + PWA
+================================================
 
-IS BUILD ME KYA ACTIVE HAI
-- Real Firebase Email/Password Authentication.
-- Student sign-up: Name + Indian mobile + password + confirm password.
-- Mobile number ke peeche internal login email generate hota hai:
-  10-digit mobile 9876543210 -> 919876543210@login.ezeevisionchampua.com
-  Student ko ye internal email kabhi enter nahi karna hai.
-- Firebase Auth session LOCAL persistence par set hai. Logout ke baad same mobile/password se login.
-- Student profile Firestore ke users/{uid} me save hota hai.
-- New student status = pending; teacher approval ke baad hi portal access.
-- Teacher role public sign-up se create nahi ho sakta.
-- Login ke baad approved/pending status screen.
-- Forgot Password WhatsApp recovery request open karta hai (manual verification; SMS OTP nahi).
-- Bottom-right animated WhatsApp support button.
+WHAT THIS BUILD INCLUDES
+- Mobile-first login and student sign-up interface.
+- Firebase Auth using mobile-derived internal email + password (no SMS OTP).
+- Student profile is written at users/{Firebase Auth UID} with role=student and status=pending.
+- Four trusted teacher accounts use the same login pattern and must have users/{UID} profiles.
+- Root manifest.webmanifest, sw.js, app icons (192/512), Apple touch icon.
+- Local app-shell offline cache. Firebase Authentication/Firestore/network requests are NOT cached.
+- Floating WhatsApp support number +91 91244 78453.
 
-IMPORTANT: PASSWORD SECURITY
-- Password Firestore me store nahi hota. Firebase Authentication password ko securely manage karta hai.
-- Internal login email fake/inbox-less identifier hai. Isliye Firebase ka email reset link deliver nahi ho sakta.
-- Forgot Password button WhatsApp support request bhejta hai. Teacher pehle student identity verify karega.
-- Is current build me automated self-service password reset nahi hai. SMS OTP ya verified real email ke bina secure automatic recovery available nahi hoti.
-- WhatsApp par kabhi password ya OTP mat bhejna.
+PWA INSTALLATION
+1. Upload all ZIP contents to the ROOT of the GitHub repository connected to Netlify.
+2. Keep index.html, manifest.webmanifest, sw.js, firebase-config.js at repository root.
+3. Commit; wait for Netlify deployment.
+4. Open https://ezeevisionchampua.netlify.app in Chrome Android.
+5. Open Chrome menu (⋮) > Install app. If not visible, choose Add to Home screen.
+6. PWA installability needs HTTPS and the manifest/icons. Chrome may apply user engagement and browser/device eligibility checks.
+7. First visit must be online so app shell can be cached. Offline mode shows cached app shell/offline message only; Firebase login, database and WhatsApp still require internet.
 
-STEP 1 — WHATSAPP SUPPORT NUMBER SET KARO
-1. GitHub me assets/js/settings.js open karo.
-2. whatsappSupportNumber me 91XXXXXXXXXX ko institute ke WhatsApp number se replace karo.
-3. Sirf digits likho: India country code + 10-digit number. +, spaces ya dash mat lagao.
-   Example format: 919876543210 (ye sirf format example hai, actual support number nahi).
-4. Commit changes.
+FIRESTORE DATA STRUCTURE — VERY IMPORTANT
+All account profiles must be documents inside ONE root collection named exactly:
+users
 
-STEP 2 — FIREBASE AUTHENTICATION ON KARO
-1. Firebase Console > Authentication > Sign-in method.
-2. Email/Password provider enable karo (Email link/passwordless ki zaroorat nahi).
-3. Authentication > Settings > Authorized domains me ezeevisionchampua.netlify.app add karo.
-4. Save karo.
+Path examples:
+users/{teacher1-auth-uid}
+users/{teacher2-auth-uid}
+users/{teacher3-auth-uid}
+users/{teacher4-auth-uid}
+users/{student-auth-uid}
 
-STEP 3 — FIRESTORE SECURITY RULES PUBLISH KARO
-1. Firebase Console > Firestore Database > Rules.
-2. Is ZIP ke firestore.rules file ka poora content copy karo.
-3. Firebase Rules editor me existing content replace karke Publish dabao.
-4. Student signup test karne se pehle rules publish hona zaroori hai.
-5. Production rules ko kabhi allow read, write: if true mat banana.
+Do NOT create users2, users3, users4 or users5. Those are separate, incorrect collection names for this app. Do not delete them yet; verify/copy any needed records into root users first.
 
-STEP 4 — FIVE TEACHER ACCOUNTS PRE-CREATE KARO
-Teacher accounts public Sign Up se nahi banenge.
-Har teacher ke liye:
-A. Firebase Console > Authentication > Users > Add user.
-B. Email field me is format ka internal ID use karo:
-   91 + teacher ke 10 digit mobile + @login.ezeevisionchampua.com
-   Example format: 919876543210@login.ezeevisionchampua.com
-C. Teacher ka initial password set karo aur securely teacher ko privately do.
-D. Created user ka UID copy karo.
-E. Firestore Data me users collection > Add document. Document ID = copied UID.
-F. Ye fields add karo:
-   name       string     (teacher ka naam)
-   mobile     string     (10 digit mobile, +91 ke bina)
-   role       string     teacher
-   status     string     approved
-   createdAt  timestamp  current date/time
-   updatedAt  timestamp  current date/time
-G. Ye process sabhi 5 teachers ke liye repeat karo. Sabhi 5 teachers ko equal teacher permissions milengi.
+Each teacher document must have:
+name (string), mobile (string: ten digits without +91), role (string: teacher),
+status (string: approved), createdAt (timestamp), updatedAt (timestamp).
+Document ID MUST exactly equal the matching Firebase Authentication UID.
+The four known teacher phone numbers are listed in TEACHERS.txt.
 
-STEP 5 — NETLIFY / GITHUB DEPLOY
-1. ZIP extract karo.
-2. ZIP ke andar ki files/folders ko GitHub repository ke ROOT me upload karo.
-3. index.html root me hona chahiye. Folder ke andar extra folder me index.html mat rakho.
-4. Commit changes. Netlify automatic redeploy karega.
-5. Browser me site refresh karke sign-up test karo.
+STUDENT PROFILE
+The current bootstrap signup creates users/{auth.uid} automatically with:
+name, mobile, role=student, status=pending, createdAt, updatedAt.
+The final admission/unique Student ID linking will be added in the Smart Student Management phase.
 
-LOGIN / SIGN-UP FLOW
-- Student apne naam, mobile aur password se account banata hai.
-- Firebase Authentication account create karta hai; Firestore profile pending status me save hoti hai.
-- Sign up karne ke baad user pending approval screen dekhega.
-- Teacher Firebase Console me student profile status ko approved karega (ya future Teacher Portal se approve karega).
-- Student logout ho kar same mobile + same password se login kar sakta hai.
-- Approved account ko abhi access-verified screen milegi. Actual Teacher/Student dashboards next module me banenge.
+PUBLISH RULES
+Firebase Console > project ezee-vision-champua-6638d > Firestore Database > Rules.
+Paste firestore.rules from this ZIP and Publish. Do not use open/public rules.
+Add ezeevisionchampua.netlify.app under Firebase Authentication > Settings > Authorized domains.
+Enable Email/Password provider.
 
-SECURITY NOTES
-- Firebase web config public client configuration hai; Admin SDK private key/service account JSON is ZIP me kabhi mat daalna.
-- Teacher accounts sirf trusted admin manually pre-create kare.
-- Firestore Rules hi actual permissions enforce karti hain; UI hide karna security nahi hota.
-- Current rules teacher ko full access deti hain. Student-specific collection rules agle data modules ke saath add karni hongi.
-- Five teacher accounts aur real WhatsApp support number configure kiye bina production launch complete nahi hai.
+IMPORTANT RECOVERY OF EXISTING AUTH ACCOUNT
+If Auth account exists but profile was mistakenly created under users5 (or users2 etc.), login will say profile not found. Firestore Console cannot move a document. Create/copy a document in root users with document ID exactly equal to the Auth UID, the correct name/mobile/role/status/timestamps. Teacher profile: role=teacher, status=approved. Student profile: role=student, status=pending (until approved). Do not create another Authentication user for the same mobile. Keep the incorrect old collection temporarily; delete it only after confirming no required data remains.
+
+PWA LIMITATION
+This is an installable web app/PWA, not an APK. It can be installed from Chrome while hosted over HTTPS. Later, this same web app can be packaged as an Android app and prepared for Play Store release after full testing and policy compliance.

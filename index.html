@@ -1,154 +1,47 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#08165f" />
-  <meta name="description" content="EZEE VISION CHAMPUA — secure coaching and learning portal." />
-  <title>EZEE VISION CHAMPUA | Login</title>
-  <link rel="stylesheet" href="./assets/css/app.css" />
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#08145d"><meta name="description" content="EZEE VISION CHAMPUA learning app">
+  <link rel="manifest" href="/manifest.webmanifest"><link rel="apple-touch-icon" href="/assets/images/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="/assets/images/app-icon-192.png">
+  <title>EZEE VISION CHAMPUA</title><link rel="stylesheet" href="/assets/css/app.css">
 </head>
 <body>
-  <main class="app-shell">
-    <div class="ambient ambient-one" aria-hidden="true"></div>
-    <div class="ambient ambient-two" aria-hidden="true"></div>
-
-    <header class="hero" aria-label="EZEE VISION CHAMPUA">
-      <div class="hero-topline">
-        <span class="secure-mark"><span class="secure-dot"></span> SECURE LEARNING SPACE</span>
-        <span class="version">EVC <b>•</b> 01</span>
-      </div>
-      <div class="hero-copy">
-        <p class="eyebrow">COACHING MANAGEMENT PORTAL</p>
-        <h1 id="heroTitle">Welcome Back<span>!</span></h1>
-        <p class="hero-subtitle">Learn. Grow. Achieve.</p>
-      </div>
-      <div class="hero-orbit orbit-one" aria-hidden="true"></div>
-      <div class="hero-orbit orbit-two" aria-hidden="true"></div>
+  <main class="shell">
+    <header class="hero">
+      <div class="micro"><span class="dot"></span> SECURE LEARNING SPACE <span class="edition">EVC • APP</span></div>
+      <div class="hero-title"><small>COACHING MANAGEMENT PORTAL</small><h1>Welcome Back<span>!</span></h1><p>Learn. Grow. Achieve.</p></div>
     </header>
-
-    <section class="auth-card" aria-label="Account access">
+    <section class="card">
       <div id="authViews">
-      <div class="brand-block">
-        <div class="logo-frame">
-          <img src="./assets/images/ezee-vision-logo.webp" alt="EZEE VISION emblem" class="brand-logo" />
-        </div>
-        <div class="brand-name">EZEE VISION <span>CHAMPUA</span></div>
-        <p class="brand-caption">YOUR JOURNEY TO EXCELLENCE</p>
+        <div class="brand"><img src="/assets/images/ezee-vision-logo-source.webp" alt="EZEE VISION emblem"><h2>EZEE VISION <span>CHAMPUA</span></h2><p>YOUR JOURNEY TO EXCELLENCE</p></div>
+        <div class="heading"><h3 id="formTitle">Sign in to your account</h3><p id="formDescription">Enter your registered mobile number and password.</p></div>
+        <form id="loginForm" novalidate>
+          <label for="loginMobile">MOBILE NUMBER</label><div class="field"><b>+91</b><span class="phone">☎</span><input id="loginMobile" type="tel" inputmode="numeric" maxlength="10" placeholder="Enter mobile number" autocomplete="tel-national" required></div>
+          <label for="loginPassword">PASSWORD</label><div class="field"><span class="lock">♙</span><input id="loginPassword" type="password" placeholder="Enter password" autocomplete="current-password" required><button class="eye" type="button" data-toggle="loginPassword">◉</button></div>
+          <div class="meta"><span>Teacher & student access</span><button type="button" id="forgotBtn">Forgot password?</button></div>
+          <button class="primary" type="submit">Login to Portal <span>➜</span></button>
+        </form>
+        <form id="signupForm" class="hidden" novalidate>
+          <label for="signupName">FULL NAME</label><div class="field"><span class="person">♙</span><input id="signupName" type="text" placeholder="Enter your full name" autocomplete="name" required></div>
+          <label for="signupMobile">MOBILE NUMBER</label><div class="field"><b>+91</b><span class="phone">☎</span><input id="signupMobile" type="tel" inputmode="numeric" maxlength="10" placeholder="Enter mobile number" autocomplete="tel-national" required></div>
+          <label for="signupPassword">CREATE PASSWORD</label><div class="field"><span class="lock">♙</span><input id="signupPassword" type="password" minlength="8" placeholder="At least 8 characters" autocomplete="new-password" required><button class="eye" type="button" data-toggle="signupPassword">◉</button></div>
+          <label for="signupConfirm">CONFIRM PASSWORD</label><div class="field"><span class="lock">♙</span><input id="signupConfirm" type="password" minlength="8" placeholder="Re-enter password" autocomplete="new-password" required><button class="eye" type="button" data-toggle="signupConfirm">◉</button></div>
+          <div class="note">✦ Student registrations are saved and reviewed by a teacher before access is activated. Teacher accounts are created by the institute.</div>
+          <button class="primary" type="submit">Request Student Account <span>➜</span></button>
+        </form>
+        <div class="switch"><span id="switchText">New to EZEE VISION?</span> <button id="switchBtn" type="button">Create account</button></div>
+        <div class="trust">✓ &nbsp; PRIVATE · SECURE · STUDENT-FOCUSED</div><footer>Made With <b>♥</b> By Shahid Sir</footer>
       </div>
-
-      <div class="form-heading">
-        <h2 id="formTitle">Sign in to your account</h2>
-        <p id="formDescription">Enter your registered mobile number and password.</p>
-      </div>
-
-      <form id="loginForm" class="auth-form" novalidate>
-        <label class="field-label" for="loginMobile">MOBILE NUMBER</label>
-        <div class="field-wrap">
-          <span class="field-prefix">+91</span>
-          <svg class="field-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7.1 3.5 9.4 7a1.7 1.7 0 0 1-.2 2.1l-1.3 1.3a14.1 14.1 0 0 0 5.7 5.7l1.3-1.3a1.7 1.7 0 0 1 2.1-.2l3.5 2.3a1.7 1.7 0 0 1 .6 2.1l-.7 1.5a2.3 2.3 0 0 1-2.3 1.3C9.2 21 3 14.8 2.2 5.9A2.3 2.3 0 0 1 3.5 3.6l1.5-.7a1.7 1.7 0 0 1 2.1.6Z"/></svg>
-          <input id="loginMobile" name="mobile" type="tel" inputmode="numeric" autocomplete="tel-national" maxlength="10" placeholder="Enter mobile number" required />
-        </div>
-
-        <label class="field-label" for="loginPassword">PASSWORD</label>
-        <div class="field-wrap">
-          <svg class="field-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="10" width="16" height="11" rx="2.2"/><path d="M8 10V7a4 4 0 1 1 8 0v3M12 14v3"/></svg>
-          <input id="loginPassword" name="password" type="password" autocomplete="current-password" placeholder="Enter your password" required />
-          <button class="reveal-btn" type="button" data-toggle-password="loginPassword" aria-label="Show password">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12s3.3-6 9.5-6 9.5 6 9.5 6-3.3 6-9.5 6-9.5-6-9.5-6Z"/><circle cx="12" cy="12" r="2.7"/><path class="slash" d="m4 4 16 16"/></svg>
-          </button>
-        </div>
-
-        <div class="form-meta">
-          <span class="account-hint">Teacher & student access</span>
-          <button type="button" class="text-action" id="forgotBtn">Forgot password?</button>
-        </div>
-        <button class="primary-btn" type="submit"><span>Login to Portal</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6"/></svg></button>
-      </form>
-
-      <form id="signupForm" class="auth-form is-hidden" novalidate>
-        <label class="field-label" for="signupName">FULL NAME</label>
-        <div class="field-wrap">
-          <svg class="field-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.5"/><path d="M4.5 20a7.5 7.5 0 0 1 15 0"/></svg>
-          <input id="signupName" name="name" type="text" autocomplete="name" placeholder="Enter your full name" required />
-        </div>
-        <label class="field-label" for="signupMobile">MOBILE NUMBER</label>
-        <div class="field-wrap">
-          <span class="field-prefix">+91</span>
-          <svg class="field-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7.1 3.5 9.4 7a1.7 1.7 0 0 1-.2 2.1l-1.3 1.3a14.1 14.1 0 0 0 5.7 5.7l1.3-1.3a1.7 1.7 0 0 1 2.1-.2l3.5 2.3a1.7 1.7 0 0 1 .6 2.1l-.7 1.5a2.3 2.3 0 0 1-2.3 1.3C9.2 21 3 14.8 2.2 5.9A2.3 2.3 0 0 1 3.5 3.6l1.5-.7a1.7 1.7 0 0 1 2.1.6Z"/></svg>
-          <input id="signupMobile" name="mobile" type="tel" inputmode="numeric" autocomplete="tel-national" maxlength="10" placeholder="Enter mobile number" required />
-        </div>
-        <label class="field-label" for="signupPassword">CREATE PASSWORD</label>
-        <div class="field-wrap">
-          <svg class="field-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="10" width="16" height="11" rx="2.2"/><path d="M8 10V7a4 4 0 1 1 8 0v3M12 14v3"/></svg>
-          <input id="signupPassword" name="password" type="password" autocomplete="new-password" minlength="6" placeholder="Create a password (6+ characters)" required />
-          <button class="reveal-btn" type="button" data-toggle-password="signupPassword" aria-label="Show password">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12s3.3-6 9.5-6 9.5 6 9.5 6-3.3 6-9.5 6-9.5-6-9.5-6Z"/><circle cx="12" cy="12" r="2.7"/><path class="slash" d="m4 4 16 16"/></svg>
-          </button>
-        </div>
-        <label class="field-label" for="signupConfirmPassword">CONFIRM PASSWORD</label>
-        <div class="field-wrap">
-          <svg class="field-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="10" width="16" height="11" rx="2.2"/><path d="M8 10V7a4 4 0 1 1 8 0v3M12 14v3"/></svg>
-          <input id="signupConfirmPassword" name="confirmPassword" type="password" autocomplete="new-password" minlength="8" placeholder="Re-enter your password" required />
-          <button class="reveal-btn" type="button" data-toggle-password="signupConfirmPassword" aria-label="Show password">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12s3.3-6 9.5-6 9.5 6 9.5 6-3.3 6-9.5 6-9.5-6-9.5-6Z"/><circle cx="12" cy="12" r="2.7"/><path class="slash" d="m4 4 16 16"/></svg>
-          </button>
-        </div>
-        <div class="approval-note"><span class="note-icon">✦</span><p>Student registrations are saved securely and reviewed by a teacher before portal access is activated. Teacher accounts are created by the institute.</p></div>
-        <button class="primary-btn" type="submit"><span>Request Student Account</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6"/></svg></button>
-      </form>
-
-      <div class="switch-line" id="switchLine">
-        <span>New to EZEE VISION?</span>
-        <button type="button" id="switchBtn">Create account</button>
-      </div>
-
-      <div class="trust-row"><span class="trust-shield">✓</span><span>PRIVATE · SECURE · STUDENT-FOCUSED</span></div>
-      <footer class="app-footer">Made With <span>♥</span> By Shahid Sir</footer>
-      </div>
-
-      <section id="accountPanel" class="account-panel is-hidden" aria-live="polite">
-        <div class="account-success-icon" id="accountIcon">✓</div>
-        <p class="account-kicker" id="accountKicker">ACCOUNT STATUS</p>
-        <h2 id="accountHeading">Welcome</h2>
-        <p id="accountMessage" class="account-message"></p>
-        <div class="account-summary">
-          <div><span>ACCOUNT</span><strong id="accountName">—</strong></div>
-          <div><span>PORTAL ROLE</span><strong id="accountRole">—</strong></div>
-          <div><span>STATUS</span><strong id="accountStatus">—</strong></div>
-        </div>
-        <button class="primary-btn" id="refreshStatusBtn" type="button"><span>Refresh account status</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11a8 8 0 0 0-14.8-3L3 11m0-5v5h5M4 13a8 8 0 0 0 14.8 3L21 13m0 5v-5h-5"/></svg></button>
-        <button class="logout-btn" id="logoutBtn" type="button">Sign out</button>
-        <p class="account-footnote">Your account and profile remain saved. Sign in again with the same mobile number and password whenever you return.</p>
-      </section>
+      <section id="accountPanel" class="hidden account" aria-live="polite"><div class="state-icon" id="stateIcon">✓</div><small id="stateKicker">ACCOUNT STATUS</small><h3 id="stateTitle">Welcome</h3><p id="stateMessage"></p><div class="profile"><div><span>NAME</span><b id="profileName">—</b></div><div><span>ROLE</span><b id="profileRole">—</b></div><div><span>STATUS</span><b id="profileStatus">—</b></div></div><button class="primary" id="refreshBtn">Refresh approval status</button><button class="logout" id="logoutBtn">Sign out</button><p class="smallprint">Account profile is saved securely. Use the same mobile number and password after logout.</p></section>
     </section>
-    <p class="copyright">© 2026 EZEE VISION CHAMPUA</p>
+    <div class="copyright">© 2026 EZEE VISION CHAMPUA</div>
+    <button id="installBtn" class="install hidden" type="button">＋ Install App</button>
   </main>
-  <div class="recovery-backdrop is-hidden" id="recoveryModal" role="dialog" aria-modal="true" aria-labelledby="recoveryTitle">
-    <div class="recovery-card">
-      <button class="modal-close" id="closeRecoveryBtn" type="button" aria-label="Close">×</button>
-      <div class="recovery-icon">↗</div>
-      <h2 id="recoveryTitle">Need password help?</h2>
-      <p>Enter your registered mobile number. We will open a WhatsApp support request. Never send your old password or OTP.</p>
-      <label class="field-label" for="recoveryMobile">REGISTERED MOBILE NUMBER</label>
-      <div class="field-wrap">
-        <span class="field-prefix">+91</span>
-        <input id="recoveryMobile" type="tel" inputmode="numeric" maxlength="10" placeholder="10-digit mobile number" autocomplete="tel-national" />
-      </div>
-      <button class="primary-btn" id="sendRecoveryBtn" type="button"><span>Contact WhatsApp Support</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6"/></svg></button>
-      <p class="recovery-note">Recovery requests are verified by the institute team. SMS OTP is not used.</p>
-    </div>
-  </div>
-  <a class="whatsapp-float" id="whatsappFloat" href="#" aria-label="WhatsApp support" title="WhatsApp Support">
-    <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3.2A12.2 12.2 0 0 0 5.5 21.6L4 28l6.6-1.7A12.2 12.2 0 1 0 16 3.2Zm0 22.1c-1.8 0-3.5-.5-5-1.4l-.4-.2-3.9 1 1-3.8-.3-.4A9.9 9.9 0 1 1 16 25.3Zm5.5-7.4c-.3-.2-1.8-.9-2.1-1-.3-.1-.5-.2-.7.2s-.8 1-1 1.2c-.2.2-.4.2-.7.1-.3-.2-1.3-.5-2.5-1.6-.9-.8-1.6-1.8-1.8-2.1-.2-.3 0-.5.1-.7l.5-.6c.2-.2.2-.4.3-.6.1-.2 0-.5 0-.6s-.7-1.7-1-2.3c-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.6.1-.9.5-.3.3-1.1 1.1-1.1 2.6s1.1 3 1.2 3.2c.2.2 2.2 3.4 5.4 4.7.8.3 1.4.5 1.9.6.8.3 1.5.2 2 .1.6-.1 1.8-.7 2.1-1.4.3-.7.3-1.3.2-1.4-.1-.2-.3-.2-.6-.4Z"/></svg>
-    <span class="wa-pulse"></span>
-  </a>
-  <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  <script src="https://www.gstatic.com/firebasejs/13.4.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/13.4.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/13.4.0/firebase-firestore-compat.js"></script>
-  <script src="./firebase-config.js"></script>
-  <script src="./assets/js/settings.js"></script>
-  <script src="./assets/js/app.js" defer></script>
-</body>
-</html>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <div id="recovery" class="overlay hidden"><section class="dialog"><button id="closeRecovery" class="close">×</button><div class="dialog-icon">↗</div><h3>Need password help?</h3><p>Enter your registered mobile number. WhatsApp support will help verify your identity and guide you through reset.</p><label for="recoveryMobile">REGISTERED MOBILE</label><div class="field"><b>+91</b><input id="recoveryMobile" inputmode="numeric" maxlength="10" placeholder="10-digit mobile"></div><button id="sendRecovery" class="primary">Contact WhatsApp Support</button><small>Never share your password or OTP.</small></section></div>
+  <a id="whatsapp" class="wa" href="https://wa.me/919124478453" target="_blank" rel="noopener" aria-label="WhatsApp support"><span>◔</span></a>
+  <script src="https://www.gstatic.com/firebasejs/13.4.0/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/13.4.0/firebase-auth-compat.js"></script><script src="https://www.gstatic.com/firebasejs/13.4.0/firebase-firestore-compat.js"></script>
+  <script src="/firebase-config.js"></script><script src="/assets/js/settings.js"></script><script src="/assets/js/app.js" defer></script>
+</body></html>

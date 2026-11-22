@@ -1,0 +1,23 @@
+EZEE VISION CHAMPUA — FOUR INITIAL TEACHER ACCOUNTS
+All four are trusted teachers with identical full teacher permissions. No separate Owner role.
+Each must be manually created in Firebase Authentication > Users > Add user, then get a Firestore profile under root users/{same UID}.
+
+Teacher 1: +91 91244 78453
+Internal Auth email: 919124478453@login.ezeevisionchampua.com
+Firestore mobile string: 9124478453
+
+Teacher 2: +91 95565 77373
+Internal Auth email: 919556577373@login.ezeevisionchampua.com
+Firestore mobile string: 9556577373
+
+Teacher 3: +91 89172 25693
+Internal Auth email: 918917225693@login.ezeevisionchampua.com
+Firestore mobile string: 8917225693
+
+Teacher 4: +91 77499 16815
+Internal Auth email: 917749916815@login.ezeevisionchampua.com
+Firestore mobile string: 7749916815
+
+Add fields name, mobile, role=teacher, status=approved, createdAt (timestamp), updatedAt (timestamp).
+Never save teacher passwords in Firestore, GitHub, a shared document, or chat.
+Future teachers can be added using the same manual process and will receive the same permissions.

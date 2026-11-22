@@ -1,27 +1,20 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    function signedIn() {
-      return request.auth != null;
-    }
-
+    function signedIn() { return request.auth != null; }
+    function ownUserDoc(userId) { return signedIn() && request.auth.uid == userId; }
     function teacherApproved() {
       return signedIn()
         && exists(/databases/$(database)/documents/users/$(request.auth.uid))
         && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'teacher'
         && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.status == 'approved';
     }
-
     match /users/{userId} {
-      // A member can read their own profile. Teachers can review all profiles.
-      allow get: if signedIn() && (request.auth.uid == userId || teacherApproved());
+      allow get: if ownUserDoc(userId) || teacherApproved();
       allow list: if teacherApproved();
-
-      // Public sign-up can ONLY create a pending student profile.
-      allow create: if signedIn()
-        && request.auth.uid == userId
-        && request.resource.data.keys().hasAll(['name', 'mobile', 'role', 'status', 'createdAt', 'updatedAt'])
-        && request.resource.data.keys().hasOnly(['name', 'mobile', 'role', 'status', 'createdAt', 'updatedAt'])
+      allow create: if ownUserDoc(userId)
+        && request.resource.data.keys().hasAll(['name','mobile','role','status','createdAt','updatedAt'])
+        && request.resource.data.keys().hasOnly(['name','mobile','role','status','createdAt','updatedAt'])
         && request.resource.data.name is string
         && request.resource.data.name.size() >= 2
         && request.resource.data.mobile is string
@@ -30,25 +23,15 @@ service cloud.firestore {
         && request.resource.data.status == 'pending'
         && request.resource.data.createdAt is timestamp
         && request.resource.data.updatedAt is timestamp;
-
-      // Users may change only their own display name. They cannot alter role/status.
-      // Approved teachers can update student approvals and manage all profiles.
       allow update: if teacherApproved()
-        || (signedIn()
-          && request.auth.uid == userId
+        || (ownUserDoc(userId)
           && resource.data.role == 'student'
           && request.resource.data.role == resource.data.role
           && request.resource.data.status == resource.data.status
-          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['name', 'updatedAt']));
-
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['name','updatedAt']));
       allow delete: if teacherApproved();
     }
-
-    // Teacher portal modules added later (students, attendance, fees, homework,
-    // study materials, tests and results) will be protected by teacher status.
-    // Student-specific access rules must be added for each student data collection.
-    match /{document=**} {
-      allow read, write: if teacherApproved();
-    }
+    // New data collections receive explicit student-owner rules when each module is built.
+    match /{document=**} { allow read, write: if teacherApproved(); }
   }
 }

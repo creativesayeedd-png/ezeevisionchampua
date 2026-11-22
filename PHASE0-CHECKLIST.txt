@@ -1,0 +1,47 @@
+PHASE 0 — FOUNDATION CHECKLIST
+===============================
+
+A. PWA
+[ ] Upload ZIP contents to Netlify-connected GitHub repository root.
+[ ] Verify https://ezeevisionchampua.netlify.app/manifest.webmanifest opens as JSON.
+[ ] Verify https://ezeevisionchampua.netlify.app/sw.js opens as JavaScript.
+[ ] On Android Chrome, open site > menu (⋮) > Install app / Add to Home screen.
+[ ] Open installed EVC app once online; later offline it should show the cached app shell/offline fallback.
+
+B. FIRESTORE ROOT COLLECTION
+There must be ONE root collection called users.
+Each account document ID must equal the UID from Firebase Authentication.
+Do not use separate collections users2/users3/users4/users5.
+
+For each of the four teacher Auth accounts, copy the Auth UID and create users/{UID} with:
+name: string
+mobile: string (10 digits, no +91)
+role: string = teacher
+status: string = approved
+createdAt: timestamp
+updatedAt: timestamp
+
+For the current test student Auth account (mobile 6205736948), use the same exact UID and create users/{UID} with:
+name: string = Shahid
+mobile: string = 6205736948
+role: string = student
+status: string = pending
+createdAt: timestamp
+updatedAt: timestamp
+
+If a record exists under users2, users3, users4 or users5, copy its values to the correct document under root users using the exact Auth UID. Do not delete old collections until the root users documents have been verified and login succeeds.
+
+C. AUTHORIZED DOMAIN / PROVIDER
+[ ] Firebase Authentication Email/Password provider enabled.
+[ ] ezeevisionchampua.netlify.app added to Authentication > Settings > Authorized domains.
+
+D. RULES
+[ ] Publish firestore.rules in project ezee-vision-champua-6638d.
+[ ] Do not publish open rules (allow read, write: if true).
+
+E. TEST
+[ ] Test student account login with mobile + the original password.
+[ ] Student status displays pending until a teacher changes it to approved.
+[ ] Test one teacher account; it must read users/{teacher UID}, with role=teacher and status=approved.
+
+Security: passwords are held by Firebase Authentication only. Never put them in Firestore or this repository.
