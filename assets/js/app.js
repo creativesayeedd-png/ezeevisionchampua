@@ -16,7 +16,8 @@
   function validMobile(value) { return /^[6-9]\d{9}$/.test(value); }
   function loginEmail(value) { return `91${value}@login.ezeevisionchampua.com`; }
   function errorText(error) {
-    const code = error?.code || '';
+    const code = error?.code || 'unknown-error';
+    const message = String(error?.message || '');
     const map = {
       'auth/invalid-credential': 'Mobile number ya password galat hai.',
       'auth/user-not-found': 'Is mobile number ka account nahi mila.',
@@ -25,12 +26,22 @@
       'auth/weak-password': 'Kam se kam 8 characters ka password rakhein.',
       'auth/too-many-requests': 'Bahut attempts hue. Thodi der baad try karein.',
       'auth/network-request-failed': 'Internet connection check karein.',
-      'permission-denied': 'Firestore Rules ne request reject ki. Correct project ke Rules tab mein supplied rules Publish karein.',
-      'firestore/permission-denied': 'Firestore permission denied. Rules aur project ID verify karein.'
+      'auth/operation-not-allowed': 'Firebase Console mein Email/Password sign-in provider enable nahi hai.',
+      'auth/unauthorized-domain': 'Current Vercel domain Firebase Authentication ke Authorized domains mein add karein.',
+      'auth/invalid-api-key': 'Firebase API key ya project configuration galat hai.',
+      'auth/project-not-found': 'Firebase project configuration check karein.',
+      'permission-denied': 'Firestore Rules ne request reject ki. Correct Firebase project mein supplied rules Publish karein.',
+      'firestore/permission-denied': 'Firestore permission denied. Rules aur project ID verify karein.',
+      'PROFILE_NOT_FOUND': 'Authentication login ho gaya, lekin users/{UID} profile nahi mila. Profile users collection mein exact Auth UID ke document ID par hona chahiye.',
+      'PROFILE_EXISTS': 'Is mobile number ka account aur profile pehle se hai. Login karein.'
     };
-    if (map[code]) return map[code];
-    if (/permission-denied/i.test(error?.message || '')) return map['permission-denied'];
-    return 'Request complete nahi hui. Firebase Console mein Auth/Firestore error verify karein.';
+    let friendly = map[code] || map[message] || '';
+    if (!friendly && /permission-denied/i.test(message)) friendly = map['permission-denied'];
+    if (!friendly && message === 'PROFILE_NOT_FOUND') friendly = map.PROFILE_NOT_FOUND;
+    if (!friendly && message === 'PROFILE_EXISTS') friendly = map.PROFILE_EXISTS;
+    if (!friendly) friendly = 'Request complete nahi hui. Error code: ' + code;
+    console.error('[EVC Firebase diagnostic]', { code, message, name: error?.name || 'Error' });
+    return `${friendly} [${code}]`;
   }
   function switchMode(signup) {
     $('loginForm').classList.toggle('hidden', signup);
@@ -43,13 +54,24 @@
   }
   $('switchBtn').addEventListener('click', () => switchMode($('signupForm').classList.contains('hidden')));
   document.querySelectorAll('[data-toggle]').forEach(btn => btn.addEventListener('click', () => {
-    const input = $(btn.dataset.toggle); input.type = input.type === 'password' ? 'text' : 'password';
+    const input = $(btn.dataset.toggle); const reveal = input.type === 'password'; input.type = reveal ? 'text' : 'password'; btn.classList.toggle('is-visible', reveal); btn.setAttribute('aria-label', reveal ? 'Hide password' : 'Show password');
   }));
   document.querySelectorAll('input[inputmode="numeric"]').forEach(input => input.addEventListener('input', () => input.value = input.value.replace(/\D/g, '').slice(0,10)));
 
   async function showProfile(user) {
-    const snap = await db.collection('users').doc(user.uid).get();
-    if (!snap.exists) throw new Error('PROFILE_NOT_FOUND');
+    let snap;
+    try {
+      snap = await db.collection('users').doc(user.uid).get();
+    } catch (error) {
+      console.error('Firestore profile read failed:', error);
+      throw error;
+    }
+    if (!snap.exists) {
+      const missing = new Error('PROFILE_NOT_FOUND');
+      missing.code = 'PROFILE_NOT_FOUND';
+      missing.uid = user.uid;
+      throw missing;
+    }
     const profile = snap.data();
     $('authViews').classList.add('hidden'); $('accountPanel').classList.remove('hidden');
     $('profileName').textContent = profile.name || user.displayName || 'Member';
@@ -64,6 +86,7 @@
       $('stateKicker').textContent = 'ACCESS NOT ACTIVE'; $('stateTitle').textContent = 'Please contact institute support';
       $('stateMessage').textContent = 'This profile is not approved for portal access.';
     }
+    return profile;
   }
   async function handleSignup(event) {
     event.preventDefault(); if (busy) return;
@@ -74,42 +97,63 @@
     if (password.length < 8) return toast('Password kam se kam 8 characters ka hona chahiye.');
     if (password !== confirm) return toast('Dono passwords match nahi kar rahe.');
     if (!auth || !db) return toast('Firebase SDK initialize nahi hua. Project configuration check karein.');
+    const trustedTeacherNumbers = ['9124478453','9556577373','8917225693','7749916815'];
+    if (trustedTeacherNumbers.includes(number)) return toast('Ye institute teacher number hai. Teacher account self-signup se nahi banta; institute se login credentials lein.');
     busy = true;
     try {
       await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
-      const cred = await auth.createUserWithEmailAndPassword(loginEmail(number), password);
-      const profile = {name, mobile:number, role:'student', status:'pending', createdAt:firebase.firestore.FieldValue.serverTimestamp(), updatedAt:firebase.firestore.FieldValue.serverTimestamp()};
-      await db.collection('users').doc(cred.user.uid).set(profile);
+      let cred;
+      try {
+        cred = await auth.createUserWithEmailAndPassword(loginEmail(number), password);
+      } catch (createError) {
+        // If a previous signup created Auth but failed before Firestore profile save,
+        // allow the same owner to finish their pending student profile.
+        if (createError.code !== 'auth/email-already-in-use') throw createError;
+        cred = await auth.signInWithEmailAndPassword(loginEmail(number), password);
+        const existing = await db.collection('users').doc(cred.user.uid).get();
+        if (existing.exists) {
+          await auth.signOut();
+          const already = new Error('PROFILE_EXISTS'); already.code = 'PROFILE_EXISTS'; throw already;
+        }
+      }
+      const ref = db.collection('users').doc(cred.user.uid);
+      await ref.set({
+        name, mobile:number, role:'student', status:'pending',
+        createdAt:firebase.firestore.FieldValue.serverTimestamp(),
+        updatedAt:firebase.firestore.FieldValue.serverTimestamp()
+      });
       try { await cred.user.updateProfile({displayName:name}); } catch (_) {}
       $('signupForm').reset();
       await showProfile(cred.user);
       toast('Student account successfully saved. Teacher approval pending.');
     } catch (error) {
-      console.error('Student signup failed', error);
-      if (error.message === 'PROFILE_NOT_FOUND') toast('Authentication account bana, lekin users/{UID} profile save nahi hua. Firebase Firestore Rules aur collection path check karein.');
-      else if (error.code === 'auth/email-already-in-use') toast('Is mobile ka Authentication account already hai. Signup repeat na karein; existing account login karein.');
-      else toast(errorText(error));
+      console.error('Student signup failed:', error);
+      toast(errorText(error));
       if (auth.currentUser) { try { await auth.signOut(); } catch (_) {} }
     } finally { busy = false; }
   }
   async function handleLogin(event) {
     event.preventDefault(); if (busy) return;
     const number = mobile($('loginMobile').value), password = $('loginPassword').value;
-    if (!validMobile(number)) return toast('Valid 10-digit mobile number enter karein.');
+    if (!validMobile(number)) return toast('Valid 10-digit Indian mobile number enter karein.');
     if (!password) return toast('Password enter karein.');
     if (!auth || !db) return toast('Firebase connection ready nahi hai.');
     busy = true;
     try {
       await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
       const cred = await auth.signInWithEmailAndPassword(loginEmail(number), password);
-      await showProfile(cred.user);
-      $('loginForm').reset(); toast('Login successful.');
+      const profile = await showProfile(cred.user);
+      $('loginForm').reset();
+      toast(profile.status === 'approved' ? 'Login successful.' : 'Login successful. Teacher approval pending.');
     } catch(error) {
-      console.error('Login/profile check failed', error);
-      if (error.message === 'PROFILE_NOT_FOUND') {
+      console.error('Login/profile check failed:', error);
+      if (error.code === 'PROFILE_NOT_FOUND' || error.message === 'PROFILE_NOT_FOUND') {
         try { await auth.signOut(); } catch (_) {}
-        toast('Authentication account exists, but users/{UID} profile is missing. Check exact root collection users and exact Auth UID.');
-      } else toast(errorText(error));
+        const uid = error.uid || 'UID_NOT_AVAILABLE';
+        toast(`Login accepted, but profile missing. Create/copy document users/${uid} (not users2/users3 etc.) with same Auth UID.`, 8500);
+      } else {
+        toast(errorText(error), 6500);
+      }
     } finally { busy = false; }
   }
   $('loginForm').addEventListener('submit', handleLogin); $('signupForm').addEventListener('submit', handleSignup);
@@ -138,7 +182,7 @@
   window.addEventListener('appinstalled', () => { $('installBtn').classList.add('hidden'); toast('EZEE VISION CHAMPUA installed.'); });
 
   if ('serviceWorker' in navigator && location.protocol === 'https:') {
-    window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js', {scope:'/'}).then(reg => {
+    window.addEventListener('load', () => navigator.serviceWorker.register(new URL('./sw.js', document.baseURI), {scope:new URL('./', document.baseURI).pathname}).then(reg => {
       reg.addEventListener('updatefound', () => console.info('EVC PWA update is downloading.'));
       console.info('EVC Service Worker registered:', reg.scope);
     }).catch(err => console.error('EVC Service Worker registration failed:', err)));
