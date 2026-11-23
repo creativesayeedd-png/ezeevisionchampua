@@ -3,9 +3,9 @@
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#08145d"><meta name="description" content="EZEE VISION CHAMPUA learning app">
-  <link rel="manifest" href="/manifest.webmanifest"><link rel="apple-touch-icon" href="/assets/images/apple-touch-icon.png">
-  <link rel="icon" type="image/png" sizes="192x192" href="/assets/images/app-icon-192.png">
-  <title>EZEE VISION CHAMPUA</title><link rel="stylesheet" href="/assets/css/app.css">
+  <link rel="manifest" href="./manifest.webmanifest"><link rel="apple-touch-icon" href="./assets/images/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="./assets/images/app-icon-192.png">
+  <title>EZEE VISION CHAMPUA</title><link rel="stylesheet" href="./assets/css/app.css">
 </head>
 <body>
   <main class="shell">
@@ -15,19 +15,19 @@
     </header>
     <section class="card">
       <div id="authViews">
-        <div class="brand"><img src="/assets/images/ezee-vision-logo-source.webp" alt="EZEE VISION emblem"><h2>EZEE VISION <span>CHAMPUA</span></h2><p>YOUR JOURNEY TO EXCELLENCE</p></div>
+        <div class="brand"><img src="./assets/images/ezee-vision-logo-source.webp" alt="EZEE VISION emblem"><h2>EZEE VISION <span>CHAMPUA</span></h2><p>YOUR JOURNEY TO EXCELLENCE</p></div>
         <div class="heading"><h3 id="formTitle">Sign in to your account</h3><p id="formDescription">Enter your registered mobile number and password.</p></div>
         <form id="loginForm" novalidate>
-          <label for="loginMobile">MOBILE NUMBER</label><div class="field"><b>+91</b><span class="phone">☎</span><input id="loginMobile" type="tel" inputmode="numeric" maxlength="10" placeholder="Enter mobile number" autocomplete="tel-national" required></div>
-          <label for="loginPassword">PASSWORD</label><div class="field"><span class="lock">♙</span><input id="loginPassword" type="password" placeholder="Enter password" autocomplete="current-password" required><button class="eye" type="button" data-toggle="loginPassword">◉</button></div>
+          <label for="loginMobile">MOBILE NUMBER</label><div class="field"><b>+91</b><span class="phone" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7.1 3.5 9.4 7a1.7 1.7 0 0 1-.2 2.1l-1.3 1.3a14.1 14.1 0 0 0 5.7 5.7l1.3-1.3a1.7 1.7 0 0 1 2.1-.2l3.5 2.3a1.7 1.7 0 0 1 .6 2.1l-.7 1.5a2.3 2.3 0 0 1-2.3 1.3C9.2 21 3 14.8 2.2 5.9A2.3 2.3 0 0 1 3.5 3.6l1.5-.7a1.7 1.7 0 0 1 2.1.6Z"/></svg></span><input id="loginMobile" type="tel" inputmode="numeric" maxlength="10" placeholder="Enter mobile number" autocomplete="tel-national" required></div>
+          <label for="loginPassword">PASSWORD</label><div class="field"><span class="lock" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="11" rx="2.2"/><path d="M8 10V7a4 4 0 1 1 8 0v3M12 14v3"/></svg></span><input id="loginPassword" type="password" placeholder="Enter password" autocomplete="current-password" required><button class="eye" type="button" data-toggle="loginPassword" aria-label="Show password"><svg viewBox="0 0 24 24"><path d="M2.5 12s3.3-6 9.5-6 9.5 6 9.5 6-3.3 6-9.5 6-9.5-6-9.5-6Z"/><circle cx="12" cy="12" r="2.7"/><path class="eye-slash" d="m4 4 16 16"/></svg></button></div>
           <div class="meta"><span>Teacher & student access</span><button type="button" id="forgotBtn">Forgot password?</button></div>
           <button class="primary" type="submit">Login to Portal <span>➜</span></button>
         </form>
         <form id="signupForm" class="hidden" novalidate>
-          <label for="signupName">FULL NAME</label><div class="field"><span class="person">♙</span><input id="signupName" type="text" placeholder="Enter your full name" autocomplete="name" required></div>
-          <label for="signupMobile">MOBILE NUMBER</label><div class="field"><b>+91</b><span class="phone">☎</span><input id="signupMobile" type="tel" inputmode="numeric" maxlength="10" placeholder="Enter mobile number" autocomplete="tel-national" required></div>
-          <label for="signupPassword">CREATE PASSWORD</label><div class="field"><span class="lock">♙</span><input id="signupPassword" type="password" minlength="8" placeholder="At least 8 characters" autocomplete="new-password" required><button class="eye" type="button" data-toggle="signupPassword">◉</button></div>
-          <label for="signupConfirm">CONFIRM PASSWORD</label><div class="field"><span class="lock">♙</span><input id="signupConfirm" type="password" minlength="8" placeholder="Re-enter password" autocomplete="new-password" required><button class="eye" type="button" data-toggle="signupConfirm">◉</button></div>
+          <label for="signupName">FULL NAME</label><div class="field"><span class="person" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M4.5 20a7.5 7.5 0 0 1 15 0"/></svg></span><input id="signupName" type="text" placeholder="Enter your full name" autocomplete="name" required></div>
+          <label for="signupMobile">MOBILE NUMBER</label><div class="field"><b>+91</b><span class="phone" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7.1 3.5 9.4 7a1.7 1.7 0 0 1-.2 2.1l-1.3 1.3a14.1 14.1 0 0 0 5.7 5.7l1.3-1.3a1.7 1.7 0 0 1 2.1-.2l3.5 2.3a1.7 1.7 0 0 1 .6 2.1l-.7 1.5a2.3 2.3 0 0 1-2.3 1.3C9.2 21 3 14.8 2.2 5.9A2.3 2.3 0 0 1 3.5 3.6l1.5-.7a1.7 1.7 0 0 1 2.1.6Z"/></svg></span><input id="signupMobile" type="tel" inputmode="numeric" maxlength="10" placeholder="Enter mobile number" autocomplete="tel-national" required></div>
+          <label for="signupPassword">CREATE PASSWORD</label><div class="field"><span class="lock" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="11" rx="2.2"/><path d="M8 10V7a4 4 0 1 1 8 0v3M12 14v3"/></svg></span><input id="signupPassword" type="password" minlength="8" placeholder="At least 8 characters" autocomplete="new-password" required><button class="eye" type="button" data-toggle="signupPassword" aria-label="Show password"><svg viewBox="0 0 24 24"><path d="M2.5 12s3.3-6 9.5-6 9.5 6 9.5 6-3.3 6-9.5 6-9.5-6-9.5-6Z"/><circle cx="12" cy="12" r="2.7"/><path class="eye-slash" d="m4 4 16 16"/></svg></button></div>
+          <label for="signupConfirm">CONFIRM PASSWORD</label><div class="field"><span class="lock" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="11" rx="2.2"/><path d="M8 10V7a4 4 0 1 1 8 0v3M12 14v3"/></svg></span><input id="signupConfirm" type="password" minlength="8" placeholder="Re-enter password" autocomplete="new-password" required><button class="eye" type="button" data-toggle="signupConfirm" aria-label="Show password"><svg viewBox="0 0 24 24"><path d="M2.5 12s3.3-6 9.5-6 9.5 6 9.5 6-3.3 6-9.5 6-9.5-6-9.5-6Z"/><circle cx="12" cy="12" r="2.7"/><path class="eye-slash" d="m4 4 16 16"/></svg></button></div>
           <div class="note">✦ Student registrations are saved and reviewed by a teacher before access is activated. Teacher accounts are created by the institute.</div>
           <button class="primary" type="submit">Request Student Account <span>➜</span></button>
         </form>
@@ -41,7 +41,7 @@
   </main>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
   <div id="recovery" class="overlay hidden"><section class="dialog"><button id="closeRecovery" class="close">×</button><div class="dialog-icon">↗</div><h3>Need password help?</h3><p>Enter your registered mobile number. WhatsApp support will help verify your identity and guide you through reset.</p><label for="recoveryMobile">REGISTERED MOBILE</label><div class="field"><b>+91</b><input id="recoveryMobile" inputmode="numeric" maxlength="10" placeholder="10-digit mobile"></div><button id="sendRecovery" class="primary">Contact WhatsApp Support</button><small>Never share your password or OTP.</small></section></div>
-  <a id="whatsapp" class="wa" href="https://wa.me/919124478453" target="_blank" rel="noopener" aria-label="WhatsApp support"><span>◔</span></a>
+  <a id="whatsapp" class="wa" href="https://wa.me/919124478453" target="_blank" rel="noopener" aria-label="WhatsApp support"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3.2A12.2 12.2 0 0 0 5.5 21.6L4 28l6.6-1.7A12.2 12.2 0 1 0 16 3.2Zm0 22.1c-1.8 0-3.5-.5-5-1.4l-.4-.2-3.9 1 1-3.8-.3-.4A9.9 9.9 0 1 1 16 25.3Zm5.5-7.4c-.3-.2-1.8-.9-2.1-1-.3-.1-.5-.2-.7.2s-.8 1-1 1.2c-.2.2-.4.2-.7.1-.3-.2-1.3-.5-2.5-1.6-.9-.8-1.6-1.8-1.8-2.1-.2-.3 0-.5.1-.7l.5-.6c.2-.2.2-.4.3-.6.1-.2 0-.5 0-.6s-.7-1.7-1-2.3c-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.6.1-.9.5-.3.3-1.1 1.1-1.1 2.6s1.1 3 1.2 3.2c.2.2 2.2 3.4 5.4 4.7.8.3 1.4.5 1.9.6.8.3 1.5.2 2 .1.6-.1 1.8-.7 2.1-1.4.3-.7.3-1.3.2-1.4-.1-.2-.3-.2-.6-.4Z"/></svg><span class="wa-pulse"></span></a>
   <script src="https://www.gstatic.com/firebasejs/13.4.0/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/13.4.0/firebase-auth-compat.js"></script><script src="https://www.gstatic.com/firebasejs/13.4.0/firebase-firestore-compat.js"></script>
-  <script src="/firebase-config.js"></script><script src="/assets/js/settings.js"></script><script src="/assets/js/app.js" defer></script>
+  <script src="./firebase-config.js"></script><script src="./assets/js/settings.js"></script><script src="./assets/js/app.js" defer></script>
 </body></html>

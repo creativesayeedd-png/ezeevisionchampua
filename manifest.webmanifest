@@ -1,21 +1,41 @@
 {
-  "id": "/",
+  "id": "./",
   "name": "EZEE VISION CHAMPUA",
   "short_name": "EZEE VISION",
   "description": "EZEE VISION CHAMPUA Coaching and Learning App",
   "lang": "en-IN",
-  "start_url": "/?source=pwa",
-  "scope": "/",
+  "start_url": "./?source=pwa",
+  "scope": "./",
   "display": "standalone",
-  "display_override": ["standalone", "minimal-ui"],
+  "display_override": [
+    "standalone",
+    "minimal-ui"
+  ],
   "orientation": "portrait-primary",
   "background_color": "#f3f3f9",
   "theme_color": "#08145d",
-  "categories": ["education"],
+  "categories": [
+    "education"
+  ],
   "prefer_related_applications": false,
   "icons": [
-    {"src": "/assets/images/app-icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any"},
-    {"src": "/assets/images/app-icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any"},
-    {"src": "/assets/images/app-icon-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"}
+    {
+      "src": "./assets/images/app-icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./assets/images/app-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./assets/images/app-icon-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
   ]
 }

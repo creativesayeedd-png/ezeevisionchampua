@@ -1,0 +1,88 @@
+EZEE VISION CHAMPUA — AUTH / FIRESTORE PROFILE FIX
+==================================================
+
+WHY LOGIN CAN AUTHENTICATE BUT STILL FAIL
+-----------------------------------------
+The app looks up exactly this document path after Firebase Authentication:
+    users/{Firebase Authentication UID}
+
+It does NOT look inside collections named users2, users3, users4 or users5.
+The earlier Firestore screenshot showed multiple separate collections (users, users2, users3,
+users4, users5). If teacher/student records were created in those extra collections, the app
+will say that the profile is missing even though the Authentication account exists.
+
+CORRECT STRUCTURE
+-----------------
+Firestore root collection: users
+    users
+      ├── {Teacher-1-Auth-UID}
+      ├── {Teacher-2-Auth-UID}
+      ├── {Teacher-3-Auth-UID}
+      ├── {Teacher-4-Auth-UID}
+      └── {Student-Auth-UID}
+
+There must be ONE users collection, with multiple documents inside it.
+Each document ID must exactly equal the UID shown for that account in Firebase Authentication.
+
+HOW TO FIX EACH TEACHER
+-----------------------
+1. Firebase Console > Authentication > Users.
+2. Open/copy Teacher 1's exact UID. Never use the mobile number as Document ID.
+3. Firestore Database > Data > click the root-level users collection.
+4. In the users collection pane, click Add document (do not click Start collection again).
+5. Document ID: paste Teacher 1's exact Auth UID.
+6. Add these fields:
+      name       string     Teacher 1 (or real name)
+      mobile     string     9124478453
+      role       string     teacher
+      status     string     approved
+      createdAt  timestamp  current date/time
+      updatedAt  timestamp  current date/time
+7. Save. Repeat inside the SAME users collection for the other 3 teacher UIDs.
+
+Teacher mobile numbers (without +91):
+  Teacher 1: 9124478453
+  Teacher 2: 9556577373
+  Teacher 3: 8917225693
+  Teacher 4: 7749916815
+
+HOW TO FIX AN EXISTING STUDENT
+------------------------------
+1. Authentication > Users > find the student's internal email / mobile-derived account.
+2. Copy the exact Auth UID.
+3. Firestore > root-level users collection > Add document.
+4. Document ID = exact Auth UID.
+5. Add fields:
+      name       string     Student full name
+      mobile     string     10-digit mobile, without +91
+      role       string     student
+      status     string     pending (or approved only after teacher approval)
+      createdAt  timestamp  current date/time
+      updatedAt  timestamp  current date/time
+6. Save and test login.
+
+IMPORTANT:
+- Do NOT create collections users2/users3/users4/users5.
+- Do NOT delete those old collections yet. First test login after copying the correct docs into users.
+- Do NOT store a password in Firestore.
+- Do NOT make rules public with allow read, write: if true.
+- If the exact UID document already exists in users, inspect role/status and rules instead of creating a duplicate.
+
+VERCEL + FIREBASE
+-----------------
+1. Use the root-upload ZIP so index.html is in the repository root.
+2. On Vercel, use Framework Preset = Other for this plain HTML/CSS/JS site.
+3. Root Directory = repository root. Build Command = blank. Output Directory = . (root).
+4. Firebase Console > Authentication > Settings > Authorized domains > Add domain.
+5. Add the exact Vercel hostname only, without https:// or any path. Example format: evc-project.vercel.app.
+6. Save. Then redeploy and reload the Vercel page.
+
+ERROR DIAGNOSTICS
+-----------------
+This build displays the actual Firebase error code in the toast and logs its details in the browser console.
+Common cases:
+- auth/invalid-credential: mobile-derived login ID or password is incorrect.
+- auth/operation-not-allowed: Email/Password provider is disabled.
+- auth/unauthorized-domain: add the current Vercel hostname to Firebase Authorized domains.
+- permission-denied: Firestore rules deny the profile read/write; publish rules in project ezee-vision-champua-6638d.
+- PROFILE_NOT_FOUND: Auth worked but exact users/{UID} document does not exist.
